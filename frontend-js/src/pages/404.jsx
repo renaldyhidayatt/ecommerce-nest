@@ -1,4 +1,3 @@
-import { Button } from 'flowbite-react';
 import { Link } from 'react-router-dom';
 
 export default function My404() {
@@ -19,7 +18,7 @@ export default function My404() {
 
           <Link
             to="/"
-            className="nline-flex items-center justify-center px-5 py-2 text-sm font-medium"
+            className="inline-flex items-center justify-center px-5 py-2 text-sm font-medium"
           >
             <button
               type="button"

@@ -10,6 +10,7 @@ import CartPage from './pages/Cart';
 import OrderPage from './pages/Order';
 import OrderGeneratePdf from './pages/OrderGeneratePdf';
 import PrivateRoute from './route/PrivateRoute';
+import RegisterPage from './pages/Register';
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
 
           <Route path="*" element={<My404 />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<RegisterPage />} />
         </Routes>
         <Footer />
       </BrowserRouter>

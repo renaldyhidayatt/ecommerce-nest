@@ -5,6 +5,9 @@
     },
     {
       "path": "frontend-js"
+    },
+    {
+      "path": "frontend-admin"
     }
   ],
   "settings": {}

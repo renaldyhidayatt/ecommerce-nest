@@ -25,8 +25,8 @@ export class Order {
   @Column({ length: 100 })
   country_code: string;
 
-  @Column({ length: 100 })
-  total_price: string;
+  @Column('decimal', { precision: 10, scale: 2 })
+  total_price: number;
 
   @Column({ length: 100 })
   total_product: string;

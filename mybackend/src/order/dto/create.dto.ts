@@ -24,6 +24,6 @@ export class CreateOrderDto {
   totalProduct: string;
 
   @ApiProperty({ required: true })
-  @IsString()
-  totalPrice: string;
+  @IsNumber()
+  totalPrice: number;
 }

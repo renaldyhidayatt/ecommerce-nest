@@ -20,6 +20,7 @@ import { Order } from './entities/Order';
 import { SliderModule } from './slider/slider.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { OrderModule } from './order/order.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { OrderModule } from './order/order.module';
     CategoryModule,
     SliderModule,
     OrderModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],
