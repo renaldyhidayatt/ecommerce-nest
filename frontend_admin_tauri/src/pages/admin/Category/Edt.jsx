@@ -1,31 +1,41 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { editCategory, fetchCategoryById } from '../../../redux/category';
-import { useParams } from 'react-router-dom';
+import { fetchCategoryById, updateCategoryById } from '../../../redux/category';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const EditCategoryPage = () => {
   const { id } = useParams();
 
-  const category = useSelector((state) => state.category);
-  const [categoryData, setCategoryData] = useState({ category_id: '', nama_kategori: '', image: null });
+  const categoryState = useSelector((state) => state.category);
+
+  const { category, loading, error } = categoryState;
+  const [name, setName] = useState('');
+  const [file, setFile] = useState(null);
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(fetchCategoryById(id));
   }, [dispatch, id]);
 
-  const handleInputChange = (e) => {
-    if (e.target.name === 'image') {
-      setCategoryData({ ...categoryData, [e.target.name]: e.target.files[0] });
-    } else {
-      setCategoryData({ ...categoryData, [e.target.name]: e.target.value });
+  useEffect(() => {
+    if (category) {
+      setName(category.nama_kategori);
     }
-  };
+  }, [category]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(editCategory(categoryData));
+    const formData = new FormData();
+
+    formData.append('name', name);
+    formData.append('file', file);
+
+    dispatch(updateCategoryById({ id, formData })).then((data) => {
+      console.log('Update:', data);
+      navigate('/admin/category');
+    });
   };
 
   return (
@@ -33,16 +43,19 @@ const EditCategoryPage = () => {
       <div className="page-title">
         <div className="row">
           <div className="col-12 col-md-6 order-md-1 order-last">
-            <h3>{heading}</h3>
+            <h3>Edit Category</h3>
           </div>
           <div className="col-12 col-md-6 order-md-2 order-first">
-            <nav aria-label="breadcrumb" className="breadcrumb-header float-start float-lg-end">
+            <nav
+              aria-label="breadcrumb"
+              className="breadcrumb-header float-start float-lg-end"
+            >
               <ol className="breadcrumb">
                 <li className="breadcrumb-item">
                   <a href="index.html">Dashboard</a>
                 </li>
                 <li className="breadcrumb-item active" aria-current="page">
-                  {heading}
+                  Edit Category
                 </li>
               </ol>
             </nav>
@@ -55,15 +68,24 @@ const EditCategoryPage = () => {
             <h3>Edit Category</h3>
           </div>
           <div className="card-body">
-            {category.error && (
-              <div className="alert alert-danger alert-dismissible fade show" role="alert">
-                {category.error}
-                <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            {error && (
+              <div
+                className="alert alert-danger alert-dismissible fade show"
+                role="alert"
+              >
+                {error.message}
+                <button
+                  type="button"
+                  className="btn-close"
+                  data-bs-dismiss="alert"
+                  aria-label="Close"
+                ></button>
               </div>
             )}
-            {category.categoryData && (
+            {loading ? (
+              <h1>Loading</h1>
+            ) : (
               <form onSubmit={handleSubmit} encType="multipart/form-data">
-                <input type="hidden" name="category_id" value={categoryData.category_id} />
                 <div className="mb-3">
                   <label htmlFor="nama_kategori" className="form-label">
                     Nama Kategori
@@ -71,10 +93,10 @@ const EditCategoryPage = () => {
                   <input
                     type="text"
                     name="nama_kategori"
-                    value={categoryData.nama_kategori}
+                    value={name}
                     className="form-control"
                     id="nama_kategori"
-                    onChange={handleInputChange}
+                    onChange={(e) => setName(e.target.value)}
                     required
                   />
                 </div>
@@ -82,16 +104,22 @@ const EditCategoryPage = () => {
                   <label htmlFor="image" className="form-label">
                     Gambar
                   </label>
-                  <input type="file" name="image" className="form-control" id="image" onChange={handleInputChange} />
+                  <input
+                    type="file"
+                    name="image"
+                    className="form-control"
+                    id="image"
+                    onChange={(e) => setFile(e.target.files[0])}
+                  />
                 </div>
                 <div className="mb-3">
                   <label htmlFor="current_image" className="form-label">
                     Gambar Saat Ini
                   </label>
                   <br />
-                  {categoryData.image_category ? (
+                  {category.image_category ? (
                     <img
-                      src={`assets/img/upload/category/${categoryData.image_category}`}
+                      src={`http://localhost:5000/${category.image_category}`}
                       alt="Current Image"
                       style={{ width: '200px' }}
                     />

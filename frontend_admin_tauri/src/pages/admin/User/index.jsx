@@ -1,29 +1,41 @@
-
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchUsers, deleteUserById} from '../../../redux/user';
+import { fetchUsers, deleteUserById } from '../../../redux/user';
 
 const UserPage = () => {
- 
-    const myuser = useSelector((state) => state.user)
+  const myuser = useSelector((state) => state.user);
 
-    const  { users, loading, error} = myuser;
-
-
+  const { users, loading, error } = myuser;
 
   const dispatch = useDispatch();
 
-
   useEffect(() => {
-  
-    dispatch(fetchUsers());
+    dispatch(fetchUsers())
+      .then((data) => console.log(data))
+      .catch((error) => {
+        console.log(error);
+      });
   }, []);
 
   const handleDeleteUser = (userId) => {
-    // Delete user with given userId
-    dispatch(deleteUserById(userId));
-  };
+    const confirmDelete = window.confirm(
+      'Are you sure you want to delete this user?'
+    );
+    if (confirmDelete) {
+      dispatch(deleteUserById(userId))
+        .then(() => {
+          // Show alert after successful deletion
+          alert('User deleted successfully');
 
+          window.location.reload();
+        })
+        .catch((error) => {
+          // Show alert if there was an error deleting the user
+          alert('Failed to delete user');
+          console.log(error);
+        });
+    }
+  };
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -33,24 +45,32 @@ const UserPage = () => {
       <div className="page-title">
         <div className="row">
           <div className="col-12 col-md-6 order-md-1 order-last">
-            <h3>{heading}</h3>
+            <h3>User</h3>
             {error && (
-              <div className="alert alert-danger alert-dismissible fade show" role="alert">
-                {error}
-                <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close" />
+              <div
+                className="alert alert-danger alert-dismissible fade show"
+                role="alert"
+              >
+                {error.message}
+                <button
+                  type="button"
+                  className="btn-close"
+                  data-bs-dismiss="alert"
+                  aria-label="Close"
+                />
               </div>
             )}
-            
           </div>
           <div className="col-12 col-md-6 order-md-2 order-first">
-            <nav aria-label="breadcrumb" className="breadcrumb-header float-start float-lg-end">
+            <nav
+              aria-label="breadcrumb"
+              className="breadcrumb-header float-start float-lg-end"
+            >
               <ol className="breadcrumb">
                 <li className="breadcrumb-item">
                   <a href="index.html">Dashboard</a>
                 </li>
-                <li className="breadcrumb-item active" aria-current="page">
-                    
-                </li>
+                <li className="breadcrumb-item active" aria-current="page"></li>
               </ol>
             </nav>
           </div>
@@ -59,7 +79,12 @@ const UserPage = () => {
       <section className="section">
         <div className="card">
           <div className="card-header">
-            <button type="button" className="btn btn-primary btn-sm mb-3" data-bs-toggle="modal" data-bs-target="#user">
+            <button
+              type="button"
+              className="btn btn-primary btn-sm mb-3"
+              data-bs-toggle="modal"
+              data-bs-target="#user"
+            >
               <i className="fas fa-user" /> Add User
             </button>
           </div>
@@ -78,7 +103,7 @@ const UserPage = () => {
               </thead>
               <tbody>
                 {users.map((user) => (
-                  <tr key={user.id}>
+                  <tr key={user.user_id}>
                     <td>{user.user_id}</td>
                     <td>{user.firstname}</td>
                     <td>{user.lastname}</td>
@@ -86,7 +111,10 @@ const UserPage = () => {
                     <td>{user.created_at}</td>
                     <td>{user.updated_at}</td>
                     <td width={250}>
-                      <a href={`/admin/user/edit/${user.user_id}`} className="btn btn-success">
+                      <a
+                        href={`/admin/user/edit/${user.user_id}`}
+                        className="btn btn-success"
+                      >
                         Edit
                       </a>
                       <button

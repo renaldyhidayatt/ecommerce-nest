@@ -1,22 +1,26 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteSliderById, fetchAllSliders } from '../../../redux/slider';
+import { Link } from 'react-router-dom';
 
 const SliderPage = () => {
-  const slider = useSelector((state) => state.slider);
+  const { sliders, error, loading } = useSelector((state) => state.slider);
 
   const dispatch = useDispatch();
 
-
   const handleDeleteSlider = (id) => {
     if (window.confirm('Are you sure you want to delete this record?')) {
-      dispatch(deleteSliderById(id))
-      }
-  }
+      dispatch(deleteSliderById(id));
+    }
+  };
 
   useEffect(() => {
-    dispatch(fetchAllSliders())
-  }, [])
+    dispatch(fetchAllSliders()).then((data) => console.log(data));
+  }, []);
+
+  if (loading) {
+    <h1>Loading</h1>;
+  }
 
   return (
     <div className="page-heading">
@@ -24,21 +28,32 @@ const SliderPage = () => {
         <div className="row">
           <div className="col-12 col-md-6 order-md-1 order-last">
             <h3>Slider - Page</h3>
-            {slider.error && (
-              <div className="alert alert-danger alert-dismissible fade show" role="alert">
-                {slider.error}
-                <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            {error && (
+              <div
+                className="alert alert-danger alert-dismissible fade show"
+                role="alert"
+              >
+                {error.message}
+                <button
+                  type="button"
+                  className="btn-close"
+                  data-bs-dismiss="alert"
+                  aria-label="Close"
+                ></button>
               </div>
             )}
           </div>
           <div className="col-12 col-md-6 order-md-2 order-first">
-            <nav aria-label="breadcrumb" className="breadcrumb-header float-start float-lg-end">
+            <nav
+              aria-label="breadcrumb"
+              className="breadcrumb-header float-start float-lg-end"
+            >
               <ol className="breadcrumb">
                 <li className="breadcrumb-item">
-                  <a href="index.html">Dashboard</a>
+                  <Link to={'/admin'}>Dashboard</Link>
                 </li>
                 <li className="breadcrumb-item active" aria-current="page">
-                    Slider
+                  Slider
                 </li>
               </ol>
             </nav>
@@ -48,7 +63,12 @@ const SliderPage = () => {
       <section className="section">
         <div className="card">
           <div className="card-header">
-            <button type="button" className="btn btn-primary btn-sm mb-3" data-bs-toggle="modal" data-bs-target="#slider">
+            <button
+              type="button"
+              className="btn btn-primary btn-sm mb-3"
+              data-bs-toggle="modal"
+              data-bs-target="#slider"
+            >
               <i className="fas fa-user"></i> Add Slider
             </button>
           </div>
@@ -65,23 +85,31 @@ const SliderPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {slider.data &&
-                  slider.data.map((row) => (
+                {sliders &&
+                  sliders.map((row) => (
                     <tr key={row.slider_id}>
                       <td>{row.slider_id}</td>
                       <td>{row.nama}</td>
                       <td>
-                        <img src={row.image} alt="Current Image" style={{ width: '200px' }} />
+                        <img
+                          src={'http://localhost:5000/' + row.image}
+                          alt="Current Image"
+                          style={{ width: '200px' }}
+                        />
                       </td>
                       <td>{row.created_at}</td>
                       <td>{row.updated_at}</td>
                       <td width="250">
-                        <a href={`/admin/slider/edit/${row.slider_id}`} className="btn btn-success">
+                        <Link
+                          to={`/admin/slider/edit/${row.slider_id}`}
+                          className="btn btn-success"
+                        >
                           Edit
-                        </a>
+                        </Link>
                         <button
-                          onClick={handleDeleteSlider(row.slider_id)}
-                          href={`/admin/slider/delete/${row.slider_id}`}
+                          onClick={() => {
+                            handleDeleteSlider(row.slider_id);
+                          }}
                           className="btn btn-danger"
                         >
                           Delete

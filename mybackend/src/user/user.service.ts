@@ -121,28 +121,22 @@ export class UserService {
 
       console.log(file.path);
 
-      const compressedImagePath = `./upload/userprofile/${userById.firstname}${file.filename}`; // Specify the desired path for the compressed image
-      await sharp(file.path)
-        .resize(800, 600)
-        .jpeg({ quality: 80 })
-        .toFile(compressedImagePath);
-
       if (user.password) {
         newPassword = await PasswordHash.hashPassword(user.password);
       } else {
         newPassword = userById.password;
       }
 
-      if (userById.image) {
-        fs.unlinkSync(userById.image);
-      }
+      // if (userById.image) {
+      //   fs.unlinkSync(userById.image);
+      // }
 
       userById.email = user.email;
       userById.firstname = user.firstname;
       userById.lastname = user.lastname;
       userById.role = role;
       userById.password = newPassword;
-      userById.image = compressedImagePath;
+      userById.image = file.path;
 
       const userUpdate = await this.userRepository.save(userById);
 
@@ -157,7 +151,7 @@ export class UserService {
   async deleteById(id: number): Promise<any> {
     try {
       const userById = await this.findById(id);
-      if (userById != null) {
+      if (userById == null) {
         throw new Error('Failed not found user');
       }
 

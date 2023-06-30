@@ -29,9 +29,7 @@ export default function Register() {
     setPassword(e.target.value);
   };
 
-  const handleConfirmPasswordChange = (
-    e
-  ) => {
+  const handleConfirmPasswordChange = (e) => {
     setConfirmPassword(e.target.value);
   };
 
@@ -130,7 +128,7 @@ export default function Register() {
       <div className="text-center mt-5 text-lg fs-4">
         <p className="text-gray-600">
           Already have an account?
-          <Link to="/login" className="font-bold">
+          <Link to="/" className="font-bold">
             Sign up
           </Link>
           .

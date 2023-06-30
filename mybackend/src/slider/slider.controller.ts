@@ -57,8 +57,6 @@ export class SliderController {
   }
 
   @Put('/:id')
-  @UseGuards(JwtGuard, RoleGuard)
-  @Role('administrator')
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
   updateById(

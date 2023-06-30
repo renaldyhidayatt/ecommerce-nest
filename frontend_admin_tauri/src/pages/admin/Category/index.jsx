@@ -1,20 +1,32 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAllCategories } from '../../../redux/category';
+import {
+  deleteCategoryById,
+  fetchAllCategories,
+} from '../../../redux/category';
+import { Link } from 'react-router-dom';
 
 const CategoryPage = () => {
-    const category = useSelector((state) => state.category);
+  const category = useSelector((state) => state.category);
 
-    const [error, loading, categories] = category
+  const { error, loading, categories } = category;
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchAllCategories())
-  }, [])
- 
-  if(loading){
-    <h1>Loading</h1>
+    dispatch(fetchAllCategories());
+  }, []);
+
+  const handleDelete = (id) => {
+    if (window.confirm('Are you sure you want to delete this record?')) {
+      dispatch(deleteCategoryById(id));
+
+      return;
+    }
+  };
+
+  if (loading) {
+    <h1>Loading</h1>;
   }
 
   return (
@@ -24,21 +36,31 @@ const CategoryPage = () => {
           <div className="col-12 col-md-6 order-md-1 order-last">
             <h3>category</h3>
             {error && (
-              <div className="alert alert-danger alert-dismissible fade show" role="alert">
+              <div
+                className="alert alert-danger alert-dismissible fade show"
+                role="alert"
+              >
                 {error}
-                <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button
+                  type="button"
+                  className="btn-close"
+                  data-bs-dismiss="alert"
+                  aria-label="Close"
+                ></button>
               </div>
             )}
-           
           </div>
           <div className="col-12 col-md-6 order-md-2 order-first">
-            <nav aria-label="breadcrumb" className="breadcrumb-header float-start float-lg-end">
+            <nav
+              aria-label="breadcrumb"
+              className="breadcrumb-header float-start float-lg-end"
+            >
               <ol className="breadcrumb">
                 <li className="breadcrumb-item">
                   <a href="index.html">Dashboard</a>
                 </li>
                 <li className="breadcrumb-item active" aria-current="page">
-                    Category
+                  Category
                 </li>
               </ol>
             </nav>
@@ -48,7 +70,12 @@ const CategoryPage = () => {
       <section className="section">
         <div className="card">
           <div className="card-header">
-            <button type="button" className="btn btn-primary btn-sm mb-3" data-bs-toggle="modal" data-bs-target="#category">
+            <button
+              type="button"
+              className="btn btn-primary btn-sm mb-3"
+              data-bs-toggle="modal"
+              data-bs-target="#category"
+            >
               <i className="fas fa-user"></i> Add Category
             </button>
           </div>
@@ -70,17 +97,23 @@ const CategoryPage = () => {
                     <td>{row.category_id}</td>
                     <td>{row.nama_kategori}</td>
                     <td>
-                      <img src={`assets/img/upload/category/${row.image_category}`} alt="Current Image" style={{ width: '200px' }} />
+                      <img
+                        src={`http://localhost:5000/${row.image_category}`}
+                        alt="Current Image"
+                        style={{ width: '200px' }}
+                      />
                     </td>
                     <td>{row.created_at}</td>
                     <td>{row.updated_at}</td>
                     <td width="250">
-                      <a href={`admin/category/edit/${row.category_id}`} className="btn btn-success">
+                      <Link
+                        to={`/admin/category/edit/${row.category_id}`}
+                        className="btn btn-success"
+                      >
                         Edit
-                      </a>
+                      </Link>
                       <a
-                        onclick="return confirm('Are you sure you want to delete this record?');"
-                        href={`admin/category/delete/${row.category_id}`}
+                        onClick={() => handleDelete(row.category_id)}
                         className="btn btn-danger"
                       >
                         Delete

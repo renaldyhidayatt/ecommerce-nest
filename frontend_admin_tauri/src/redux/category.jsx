@@ -1,30 +1,39 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { myApi } from '../helpers/api';
 
 // Import your API functions or services here
 
-export const fetchAllCategories = createAsyncThunk('categories/fetchAll', async (_, { rejectWithValue }) => {
-  try {
-    const response = await api.get('/');
-    return response.data;
-  } catch (error) {
-    return rejectWithValue(error.response.data);
+export const fetchAllCategories = createAsyncThunk(
+  'categories/fetchAll',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await myApi.get('/category');
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
   }
-});
+);
 
-export const fetchCategoryById = createAsyncThunk('categories/fetchById', async (id, { rejectWithValue }) => {
-  try {
-    const response = await api.get(`/${id}`);
-    return response.data;
-  } catch (error) {
-    return rejectWithValue(error.response.data);
+export const fetchCategoryById = createAsyncThunk(
+  'categories/fetchById',
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await myApi.get(`/category/${id}`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
   }
-});
+);
 
 export const createCategory = createAsyncThunk(
   'categories/create',
-  async ({ createCategory, file }, { rejectWithValue }) => {
+  async ({ createCategory }, { rejectWithValue }) => {
     try {
-      const response = await api.post('/create', createCategory, file);
+      const response = await myApi.post('/category/create', createCategory, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -34,9 +43,11 @@ export const createCategory = createAsyncThunk(
 
 export const updateCategoryById = createAsyncThunk(
   'categories/updateById',
-  async ({ id, updateCategoryDto, file }, { rejectWithValue }) => {
+  async ({ id, formData }, { rejectWithValue }) => {
     try {
-      const response = await api.put(`/${id}`, updateCategoryDto, file);
+      const response = await myApi.put(`/category/${id}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -44,18 +55,22 @@ export const updateCategoryById = createAsyncThunk(
   }
 );
 
-export const deleteCategoryById = createAsyncThunk('categories/deleteById', async (id, { rejectWithValue }) => {
-  try {
-    await api.delete(`/${id}`);
-    return id;
-  } catch (error) {
-    return rejectWithValue(error.response.data);
+export const deleteCategoryById = createAsyncThunk(
+  'categories/deleteById',
+  async (id, { rejectWithValue }) => {
+    try {
+      await myApi.delete(`/category/${id}`);
+      return id;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
   }
-});
+);
 
 const categoriesSlice = createSlice({
   name: 'categories',
   initialState: {
+    category: {},
     categories: [],
     loading: false,
     error: null,
@@ -81,10 +96,7 @@ const categoriesSlice = createSlice({
       })
       .addCase(fetchCategoryById.fulfilled, (state, action) => {
         state.loading = false;
-        const category = state.categories.find((category) => category.id === action.payload.id);
-        if (category) {
-          Object.assign(category, action.payload);
-        }
+        state.category = action.payload;
       })
       .addCase(fetchCategoryById.rejected, (state, action) => {
         state.loading = false;
@@ -108,7 +120,9 @@ const categoriesSlice = createSlice({
       })
       .addCase(updateCategoryById.fulfilled, (state, action) => {
         state.loading = false;
-        const category = state.categories.find((category) => category.id === action.payload.id);
+        const category = state.categories.find(
+          (category) => category.id === action.payload.id
+        );
         if (category) {
           Object.assign(category, action.payload);
         }
@@ -123,7 +137,9 @@ const categoriesSlice = createSlice({
       })
       .addCase(deleteCategoryById.fulfilled, (state, action) => {
         state.loading = false;
-        state.categories = state.categories.filter((category) => category.id !== action.payload);
+        state.categories = state.categories.filter(
+          (category) => category.id !== action.payload
+        );
       })
       .addCase(deleteCategoryById.rejected, (state, action) => {
         state.loading = false;

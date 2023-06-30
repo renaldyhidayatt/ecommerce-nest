@@ -7,7 +7,7 @@
       "path": "frontend-js"
     },
     {
-      "path": "frontend-admin"
+      "path": "frontend_admin_tauri"
     }
   ],
   "settings": {}

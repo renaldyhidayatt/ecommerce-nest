@@ -1,23 +1,46 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { fetchRoleById, updateRoleById } from '../../../redux/role';
+import { useState } from 'react';
 
 const EditRolePage = () => {
   const { id } = useParams();
   const role = useSelector((state) => state.role);
   const { loading, error, selectedRole } = role;
+  const navigate = useNavigate();
+
+  const [name, setName] = useState('');
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchRoleById(id));
+    dispatch(fetchRoleById(id)).then((data) => console.log(data));
   }, []);
+
+  useEffect(() => {
+    if (selectedRole) {
+      setName(selectedRole.role);
+
+      console.log(selectedRole);
+    }
+  }, [selectedRole]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const formData = new FormData(e.target);
-    dispatch(updateRoleById(formData));
+
+    const updateRole = {
+      role: name,
+    };
+
+    dispatch(updateRoleById({ id, updateRole })).then((data) => {
+      console.log(data);
+      navigate('/admin/role');
+    });
   };
+
+  if (loading) {
+    <h1>Loading</h1>;
+  }
 
   return (
     <div className="page-heading">
@@ -27,7 +50,10 @@ const EditRolePage = () => {
             <h3>Role</h3>
           </div>
           <div className="col-12 col-md-6 order-md-2 order-first">
-            <nav aria-label="breadcrumb" className="breadcrumb-header float-start float-lg-end">
+            <nav
+              aria-label="breadcrumb"
+              className="breadcrumb-header float-start float-lg-end"
+            >
               <ol className="breadcrumb">
                 <li className="breadcrumb-item">
                   <a href="index.html">Dashboard</a>
@@ -47,21 +73,39 @@ const EditRolePage = () => {
           </div>
           <div className="card-body">
             {error && (
-              <div className="alert alert-danger alert-dismissible fade show" role="alert">
-                {error}
-                <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              <div
+                className="alert alert-danger alert-dismissible fade show"
+                role="alert"
+              >
+                {error.message}
+                <button
+                  type="button"
+                  className="btn-close"
+                  data-bs-dismiss="alert"
+                  aria-label="Close"
+                ></button>
               </div>
             )}
-            {selectedRole && (
-              <form onSubmit={handleSubmit}>
-                <input type="hidden" name="role_id" value={selectedRole.role_id} />
-                <div className="mb-3">
-                  <label htmlFor="role" className="form-label">Nama Role</label>
-                  <input type="text" name="role" defaultValue={selectedRole.role} className="form-control" id="role" aria-describedby="emailHelp" />
-                </div>
-                <button type="submit" name="submit" className="btn btn-primary">Submit</button>
-              </form>
-            )}
+
+            <form onSubmit={handleSubmit}>
+              <div className="mb-3">
+                <label htmlFor="role" className="form-label">
+                  Nama Role
+                </label>
+                <input
+                  type="text"
+                  name="role"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="form-control"
+                  id="role"
+                  aria-describedby="emailHelp"
+                />
+              </div>
+              <button type="submit" name="submit" className="btn btn-primary">
+                Submit
+              </button>
+            </form>
           </div>
         </div>
       </section>

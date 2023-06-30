@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { myApi } from '../../helpers/api';
-import RevenueChart from '../../components/RevenuChart';
+import RevenueChart from '../../components/RevenueChart';
 
 export default function Dashboard() {
   const [revenueData, setRevenueData] = useState([]);

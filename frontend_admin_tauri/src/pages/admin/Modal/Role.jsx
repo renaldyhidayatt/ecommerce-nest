@@ -1,40 +1,67 @@
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { createRole } from '../../../redux/role';
 
 export default function ModalRole() {
-    return (
-        <div class="modal fade text-left" id="role" tabindex="-1" role="dialog" aria-labelledby="role" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title" id="role">
-                            Add Role
-                        </h4>
-                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                            <i data-feather="x"></i>
-                        </button>
-                    </div>
-                    <form action="<?= base_url('admin/role'); ?>" method="POST">
-                        <div class="modal-body">
-                            <label for="role">Nama Role: </label>
-                            <div class="form-group">
-                                <input id="role" type="text" name="role" placeholder="Nama Role" class="form-control" />
-                            </div>
+  const [roleName, setRoleName] = useState('');
+  const dispatch = useDispatch();
 
+  const handleRoleNameChange = (e) => {
+    setRoleName(e.target.value);
+  };
 
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
-                                <i class="bx bx-x d-block d-sm-none"></i>
-                                <span class="d-none d-sm-block">Close</span>
-                            </button>
-                            <button type="submit" class="btn btn-primary ms-1" data-bs-dismiss="modal">
-                                <i class="bx bx-check d-block d-sm-none"></i>
-                                <span class="d-none d-sm-block">Adding</span>
-                            </button>
-                        </div>
-                    </form>
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-                </div>
-            </div>
+    const formData = {
+      role: roleName,
+    };
+
+    dispatch(createRole(formData));
+  };
+
+  return (
+    <div
+      className="modal fade text-left"
+      id="role"
+      tabIndex="-1"
+      role="dialog"
+      aria-labelledby="role"
+      aria-hidden="true"
+    >
+      {/* Modal content */}
+      <form onSubmit={handleSubmit}>
+        <div className="modal-body">
+          <label htmlFor="role">Nama Role: </label>
+          <div className="form-group">
+            <input
+              id="role"
+              type="text"
+              name="role"
+              placeholder="Nama Role"
+              className="form-control"
+              value={roleName}
+              onChange={handleRoleNameChange}
+            />
+          </div>
         </div>
-    )
+        <div className="modal-footer">
+          <button
+            type="button"
+            className="btn btn-light-secondary"
+            data-bs-dismiss="modal"
+          >
+            Close
+          </button>
+          <button
+            type="submit"
+            className="btn btn-primary ms-1"
+            data-bs-dismiss="modal"
+          >
+            Adding
+          </button>
+        </div>
+      </form>
+    </div>
+  );
 }

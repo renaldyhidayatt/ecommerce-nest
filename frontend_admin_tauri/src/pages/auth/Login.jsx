@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { loginAction } from '../../redux/auth';
 
@@ -7,6 +7,9 @@ export default function Login() {
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
+
+  const { user, token, error, loading } = useSelector((state) => state.auth);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -27,13 +30,28 @@ export default function Login() {
     };
 
     dispatch(loginAction(login))
-      .then(() => {
-        navigate('/dashboard');
+      .then((data) => {
+        console.log(data);
+        navigate('/admin');
       })
       .catch((error) => {
         console.log('Login error:', error);
       });
   };
+
+  if (loading) {
+    <h1>Loading</h1>;
+  }
+
+  if (error) {
+    <h1>{error.message}</h1>;
+  }
+
+  useEffect(() => {
+    if (user) {
+      navigate('/admin');
+    }
+  }, [user]);
 
   return (
     <>
@@ -90,7 +108,7 @@ export default function Login() {
       <div className="text-center mt-5 text-lg fs-4">
         <p className="text-gray-600">
           Don't have an account?
-          <Link to="/" className="font-bold">
+          <Link to="/register" className="font-bold">
             Sign up
           </Link>
           .

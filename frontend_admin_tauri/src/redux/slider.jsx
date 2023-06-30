@@ -1,12 +1,11 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-// Import your API functions or services here
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { myApi } from '../helpers/api';
 
 export const fetchAllSliders = createAsyncThunk(
   'sliders/fetchAll',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get('/');
+      const response = await myApi.get('/slider');
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -18,7 +17,7 @@ export const fetchSliderById = createAsyncThunk(
   'sliders/fetchById',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/${id}`);
+      const response = await myApi.get(`/slider/${id}`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -28,13 +27,9 @@ export const fetchSliderById = createAsyncThunk(
 
 export const createSlider = createAsyncThunk(
   'sliders/create',
-  async ({ createSlider, file }, { rejectWithValue }) => {
+  async ({ formData }, { rejectWithValue }) => {
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('createSlider', JSON.stringify(createSlider));
-
-      const response = await api.post('/create', formData, {
+      const response = await myApi.post('/create', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
@@ -47,13 +42,9 @@ export const createSlider = createAsyncThunk(
 
 export const updateSliderById = createAsyncThunk(
   'sliders/updateById',
-  async ({ id, updateSlider, file }, { rejectWithValue }) => {
+  async ({ id, formData }, { rejectWithValue }) => {
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('updateSlider', JSON.stringify(updateSlider));
-
-      const response = await api.put(`/${id}`, formData, {
+      const response = await myApi.put(`/slider/${id}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
@@ -68,7 +59,7 @@ export const deleteSliderById = createAsyncThunk(
   'sliders/deleteById',
   async (id, { rejectWithValue }) => {
     try {
-      await api.delete(`/${id}`);
+      await myApi.delete(`/slider/${id}`);
       return id;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -79,6 +70,7 @@ export const deleteSliderById = createAsyncThunk(
 const slidersSlice = createSlice({
   name: 'sliders',
   initialState: {
+    slider: {},
     sliders: [],
     loading: false,
     error: null,
@@ -104,10 +96,7 @@ const slidersSlice = createSlice({
       })
       .addCase(fetchSliderById.fulfilled, (state, action) => {
         state.loading = false;
-        const slider = state.sliders.find((slider) => slider.id === action.payload.id);
-        if (slider) {
-          Object.assign(slider, action.payload);
-        }
+        state.slider = action.payload;
       })
       .addCase(fetchSliderById.rejected, (state, action) => {
         state.loading = false;
@@ -131,7 +120,9 @@ const slidersSlice = createSlice({
       })
       .addCase(updateSliderById.fulfilled, (state, action) => {
         state.loading = false;
-        const slider = state.sliders.find((slider) => slider.id === action.payload.id);
+        const slider = state.sliders.find(
+          (slider) => slider.id === action.payload.id
+        );
         if (slider) {
           Object.assign(slider, action.payload);
         }
@@ -146,7 +137,9 @@ const slidersSlice = createSlice({
       })
       .addCase(deleteSliderById.fulfilled, (state, action) => {
         state.loading = false;
-        state.sliders = state.sliders.filter((slider) => slider.id !== action.payload);
+        state.sliders = state.sliders.filter(
+          (slider) => slider.id !== action.payload
+        );
       })
       .addCase(deleteSliderById.rejected, (state, action) => {
         state.loading = false;

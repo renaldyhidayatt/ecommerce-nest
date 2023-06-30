@@ -22,17 +22,27 @@ const RolePage = () => {
       <div className="page-title">
         <div className="row">
           <div className="col-12 col-md-6 order-md-1 order-last">
-            <h3>{/* Your heading variable */}</h3>
+            <h3>Role Page</h3>
             {error && (
-              <div className="alert alert-danger alert-dismissible fade show" role="alert">
-                {error}
-                <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              <div
+                className="alert alert-danger alert-dismissible fade show"
+                role="alert"
+              >
+                {error.message}
+                <button
+                  type="button"
+                  className="btn-close"
+                  data-bs-dismiss="alert"
+                  aria-label="Close"
+                ></button>
               </div>
             )}
-           
           </div>
           <div className="col-12 col-md-6 order-md-2 order-first">
-            <nav aria-label="breadcrumb" className="breadcrumb-header float-start float-lg-end">
+            <nav
+              aria-label="breadcrumb"
+              className="breadcrumb-header float-start float-lg-end"
+            >
               <ol className="breadcrumb">
                 <li className="breadcrumb-item">
                   <a href="index.html">Dashboard</a>
@@ -48,7 +58,12 @@ const RolePage = () => {
       <section className="section">
         <div className="card">
           <div className="card-header">
-            <button type="button" className="btn btn-primary btn-sm mb-3" data-bs-toggle="modal" data-bs-target="#role">
+            <button
+              type="button"
+              className="btn btn-primary btn-sm mb-3"
+              data-bs-toggle="modal"
+              data-bs-target="#role"
+            >
               <i className="fas fa-user"></i> Add Role
             </button>
           </div>
@@ -71,8 +86,18 @@ const RolePage = () => {
                     <td>{row.created_at}</td>
                     <td>{row.updated_at}</td>
                     <td width="250">
-                      <a href={`/admin/role/edit/${row.role_id}`} className="btn btn-success">Edit</a>
-                      <a onClick={() => handleDelete(row.role_id)} className="btn btn-danger">Delete</a>
+                      <a
+                        href={`/admin/role/edit/${row.role_id}`}
+                        className="btn btn-success"
+                      >
+                        Edit
+                      </a>
+                      <a
+                        onClick={() => handleDelete(row.role_id)}
+                        className="btn btn-danger"
+                      >
+                        Delete
+                      </a>
                     </td>
                   </tr>
                 ))}

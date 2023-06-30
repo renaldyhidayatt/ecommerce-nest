@@ -1,52 +1,67 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { fetchUserById } from '../../../redux/user';
+import { fetchUserById, updateUserById } from '../../../redux/user';
 import { useDispatch, useSelector } from 'react-redux';
+import { fetchAllRoles } from '../../../redux/role';
 
 const EditUserPage = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
 
-  const user = useSelector((state) => state.user);
+  const myuser = useSelector((state) => state.user);
 
-  const { users, loading, error } = user;
+  const roles = useSelector((state) => state.role.roles);
+
+  const { user, loading, error } = myuser;
   const [firstname, setFirstname] = useState('');
   const [lastname, setLastname] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState('');
+  const [file, setFile] = useState(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submitted:', {
-      firstname,
-      lastname,
-      email,
-      password,
-    });
+
+    const formData = new FormData();
+    formData.append('firstname', firstname);
+    formData.append('lastname', lastname);
+    formData.append('email', email);
+    formData.append('password', password);
+    formData.append('role', role);
+    formData.append('file', file);
+
+    dispatch(updateUserById({ id, formData }));
   };
 
   useEffect(() => {
-    dispatch(fetchUserById(id));
+    dispatch(fetchUserById(id)).then((data) => console.log(data));
+    dispatch(fetchAllRoles()).then((data) => console.log(data));
   }, []);
 
   useEffect(() => {
-    if (users.length > 0) {
-      const currentUser = users.find((user) => user.user_id === id);
-      if (currentUser) {
-        setFirstname(currentUser.firstname);
-        setLastname(currentUser.lastname);
-        setEmail(currentUser.email);
-        setPassword(currentUser.password);
-      }
+    if (user) {
+      setFirstname(user.firstname);
+      setLastname(user.lastname);
+      setEmail(user.email);
+      setPassword(user.password);
     }
-  }, [users]);
+  }, [user]);
+
+  if (loading) {
+    return <h1>{loading.message}</h1>;
+  }
+
+  if (error) {
+    return <h1>{error.message}</h1>;
+  }
 
   return (
     <div className="page-heading">
       <div className="page-title">
         <div className="row">
           <div className="col-12 col-md-6 order-md-1 order-last">
-            <h3>{/* Replace with the actual heading */}</h3>
+            <h3>Edit User</h3>
           </div>
           <div className="col-12 col-md-6 order-md-2 order-first">
             <nav
@@ -126,6 +141,40 @@ const EditUserPage = () => {
                   className="form-control"
                   id="nama"
                   aria-describedby="emailHelp"
+                />
+              </div>
+              <div className="mb-3">
+                <label htmlFor="role" className="form-label">
+                  Role
+                </label>
+                <select
+                  name="role"
+                  value={role}
+                  onChange={(e) => setRole(parseInt(e.target.value))}
+                  className="form-control"
+                  id="role"
+                >
+                  <option value="-">Silahkan pilih</option>
+                  {roles.map((role) => (
+                    <>
+                      <option key={role.role_id} value={role.role_id}>
+                        {role.role}
+                      </option>
+                    </>
+                  ))}
+                </select>
+              </div>
+              <div className="mb-3">
+                <label htmlFor="file" className="form-label">
+                  File
+                </label>
+                <input
+                  type="file"
+                  name="file"
+                  onChange={(e) => setFile(e.target.files[0])}
+                  className="form-control"
+                  id="file"
+                  aria-describedby="fileHelp"
                 />
               </div>
               <button type="submit" name="submit" className="btn btn-primary">

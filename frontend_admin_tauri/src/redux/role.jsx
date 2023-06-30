@@ -1,11 +1,14 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-
+import { myApi } from '../helpers/api';
 
 export const createRole = createAsyncThunk(
   'roles/create',
-  async (createRole, { rejectWithValue }) => {
+  async (createRole, { getState, rejectWithValue }) => {
     try {
-      const response = await api.post('/create', createRole);
+      const token = getState().auth.token;
+      const response = await myApi.post('/role/create', createRole, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -13,29 +16,46 @@ export const createRole = createAsyncThunk(
   }
 );
 
-export const fetchAllRoles = createAsyncThunk('roles/fetchAll', async (_, { rejectWithValue }) => {
-  try {
-    const response = await api.get('/');
-    return response.data;
-  } catch (error) {
-    return rejectWithValue(error.response.data);
+export const fetchAllRoles = createAsyncThunk(
+  'roles/fetchAll',
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const token = getState().auth.token;
+      console.log(token);
+      const response = await myApi.get('/role', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
   }
-});
+);
 
-export const fetchRoleById = createAsyncThunk('roles/fetchById', async (id, { rejectWithValue }) => {
-  try {
-    const response = await api.get(`/${id}`);
-    return response.data;
-  } catch (error) {
-    return rejectWithValue(error.response.data);
+export const fetchRoleById = createAsyncThunk(
+  'roles/fetchById',
+  async (id, { getState, rejectWithValue }) => {
+    try {
+      const token = getState().auth.token;
+      const response = await myApi.get(`/role/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
   }
-});
+);
 
 export const updateRoleById = createAsyncThunk(
   'roles/updateById',
-  async ({ id, updateRole }, { rejectWithValue }) => {
+  async ({ id, updateRole }, { getState, rejectWithValue }) => {
     try {
-      const response = await api.put(`/${id}`, updateRole);
+      const token = getState().auth.token;
+      const response = await myApi.put(`/role/${id}`, updateRole, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -43,18 +63,25 @@ export const updateRoleById = createAsyncThunk(
   }
 );
 
-export const deleteRoleById = createAsyncThunk('roles/deleteById', async (id, { rejectWithValue }) => {
-  try {
-    await api.delete(`/${id}`);
-    return id;
-  } catch (error) {
-    return rejectWithValue(error.response.data);
+export const deleteRoleById = createAsyncThunk(
+  'roles/deleteById',
+  async (id, { getState, rejectWithValue }) => {
+    try {
+      const token = getState().auth.token;
+      await myApi.delete(`/role/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return id;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
   }
-});
+);
 
 const rolesSlice = createSlice({
   name: 'roles',
   initialState: {
+    selectedRole: {},
     roles: [],
     loading: false,
     error: null,
@@ -92,10 +119,7 @@ const rolesSlice = createSlice({
       })
       .addCase(fetchRoleById.fulfilled, (state, action) => {
         state.loading = false;
-        const role = state.roles.find((role) => role.id === action.payload.id);
-        if (role) {
-          Object.assign(role, action.payload);
-        }
+        state.selectedRole = action.payload;
       })
       .addCase(fetchRoleById.rejected, (state, action) => {
         state.loading = false;
