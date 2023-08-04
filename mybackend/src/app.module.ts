@@ -21,6 +21,10 @@ import { SliderModule } from './slider/slider.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { OrderModule } from './order/order.module';
 import { AdminModule } from './admin/admin.module';
+import { CartModule } from './cart/cart.module';
+import { RajaOngkirModule } from './raja_ongkir/raja_ongkir.module';
+import { Cart } from './entities/Cart';
+import { MidtransModule } from './midtrans/midtrans.module';
 
 @Module({
   imports: [
@@ -51,7 +55,7 @@ import { AdminModule } from './admin/admin.module';
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
-      entities: [User, Role, Category, Product, Slider, Order],
+      entities: [User, Role, Category, Product, Slider, Order, Cart],
       synchronize: true,
     }),
     AuthModule,
@@ -62,6 +66,9 @@ import { AdminModule } from './admin/admin.module';
     SliderModule,
     OrderModule,
     AdminModule,
+    CartModule,
+    RajaOngkirModule,
+    MidtransModule,
   ],
   controllers: [AppController],
   providers: [AppService],

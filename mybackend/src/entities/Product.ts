@@ -4,8 +4,10 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { Category } from './Category';
+import { Cart } from './Cart';
 
 @Entity()
 export class Product {
@@ -30,6 +32,9 @@ export class Product {
 
   @Column()
   price: number;
+
+  @Column()
+  weight: number;
 
   @Column()
   countInStock: number;

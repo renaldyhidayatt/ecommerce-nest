@@ -3,21 +3,28 @@ import { IsEmail, IsNumber, IsString } from 'class-validator';
 
 export class CreateOrderDto {
   @ApiProperty({ required: true })
-  @IsNumber()
-  user_id: number;
+  nama: string;
 
   @ApiProperty({ required: true })
-  @IsEmail()
-  @IsString()
-  email: string;
+  phone: string;
 
   @ApiProperty({ required: true })
-  @IsString()
-  postalCode: string;
+  provinsi: string;
 
   @ApiProperty({ required: true })
-  @IsString()
-  countryCode: string;
+  kota: string;
+
+  @ApiProperty({ required: true })
+  alamat: string;
+
+  @ApiProperty({ required: true })
+  kurir: string;
+
+  @ApiProperty({ required: true })
+  shippingMethod: string;
+
+  @ApiProperty({ required: true })
+  shippingCost: number;
 
   @ApiProperty({ required: true })
   @IsString()

@@ -51,18 +51,22 @@ export class OrderService {
       .getMany();
   }
 
-  async create(dto: CreateOrderDto): Promise<Order> {
+  async create(user_id, dto: CreateOrderDto): Promise<Order> {
     try {
-      const user = await this.userService.findById(dto.user_id);
+      const user = await this.userService.findById(user_id);
 
       if (user == null) {
         throw new Error('Failed not found user');
       }
 
       const createOrder = this.orderRepository.create({
-        email: dto.email,
-        postal_code: dto.postalCode,
-        country_code: dto.countryCode,
+        nama: dto.nama,
+        phone: dto.phone,
+        provinsi: dto.provinsi,
+        kota: dto.kota,
+        alamat: dto.alamat,
+        shippingMethod: dto.shippingMethod,
+        shippingCost: dto.shippingCost,
         total_product: dto.totalProduct,
         total_price: dto.totalPrice,
         user: user,

@@ -72,6 +72,7 @@ export class ProductService {
         category: category,
         description: dto.description,
         price: dto.price,
+        weight: dto.weight,
         countInStock: dto.countInStock,
         slug_product: slug,
       });
@@ -98,10 +99,8 @@ export class ProductService {
         const product: Product = await this.findById(productId);
         const currentStock = product.countInStock;
 
-        // Decrease stock based on the quantity in the cart
         const newStock = currentStock - quantity;
 
-        // Update the countInStock value in the database
         const result = this.myupdateQuantity(productId, newStock);
 
         if (result) {

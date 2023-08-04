@@ -3,10 +3,12 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Role } from './Role';
+import { Cart } from './Cart';
 
 @Entity()
 export class User {
@@ -25,11 +27,14 @@ export class User {
   @Column({ length: 70 })
   password: string;
 
-  @Column({ default: 'default.jpg' }) // Add the default value for the image column
+  @Column({ default: 'default.jpg' })
   image: string;
 
   @ManyToOne(() => Role)
   role: Role;
+
+  @OneToMany(() => Cart, (cart) => cart.user) // One user has many carts
+  cartItems: Cart[];
 
   @CreateDateColumn()
   created_at: Date;
