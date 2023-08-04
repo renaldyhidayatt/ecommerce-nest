@@ -5,6 +5,7 @@ import categoryReducer from './category';
 import productReducer from './product';
 import cartReducer from './cart';
 import orderReducer from './order';
+import rajaongkir from './rajaongkir';
 
 const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ const store = configureStore({
     product: productReducer,
     cart: cartReducer,
     order: orderReducer,
+    rajaOngkir: rajaongkir,
   },
 });
 

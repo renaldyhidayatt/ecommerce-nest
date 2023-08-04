@@ -11,6 +11,9 @@ import OrderPage from './pages/Order';
 import OrderGeneratePdf from './pages/OrderGeneratePdf';
 import PrivateRoute from './route/PrivateRoute';
 import RegisterPage from './pages/Register';
+import CheckoutForm from './pages/Checkout';
+import MidtransPaymentButton from './pages/test_midtrans';
+import SimpleSnapExample from './pages/snap_test';
 
 function App() {
   return (
@@ -22,6 +25,9 @@ function App() {
           <Route path="/category/:slug" element={<CategoryPage />} />
           <Route path="/product/:slug" element={<ProductPage />} />
           <Route path="/cart" element={<CartPage />} />
+          <Route path="/checkout" element={<CheckoutForm />} />
+          <Route path="/midtrans" element={<MidtransPaymentButton />} />
+          <Route path="/snap" element={<SimpleSnapExample />} />
           <Route
             path="/order"
             element={

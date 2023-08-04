@@ -24,15 +24,16 @@ export default function ProductPage() {
       return;
     }
 
-    const { name, price, product_id, image_product } = product;
+    const { name, price, product_id, image_product, weight } = product;
 
     dispatch(
       addToCart({
         name,
         price,
-        image: image_product,
+        image_product: image_product,
         quantity: selectedQuantity,
         product_id,
+        weight,
       })
     );
 
@@ -89,6 +90,9 @@ export default function ProductPage() {
               </div>
               <p className="mt-6 text-gray-800 font-semibold">
                 Rp.{product.price}
+              </p>
+              <p className="mt-6 text-gray-800 font-semibold">
+                Weight: {product.weight}
               </p>
               <div className="mt-6">
                 {product.countInStock > 0 ? (
