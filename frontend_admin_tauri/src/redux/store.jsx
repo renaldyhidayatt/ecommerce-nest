@@ -6,6 +6,7 @@ import sliderReducer from './slider';
 import roleReducer from './role';
 import productReducer from './product';
 import categoryReducer from './category';
+import orderReducer from './order';
 
 const store = configureStore({
   reducer: {
@@ -14,7 +15,8 @@ const store = configureStore({
     slider: sliderReducer,
     role: roleReducer,
     product: productReducer,
-    category: categoryReducer
+    category: categoryReducer,
+    order: orderReducer,
   },
 });
 

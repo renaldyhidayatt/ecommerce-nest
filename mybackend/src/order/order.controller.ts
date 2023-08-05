@@ -32,7 +32,7 @@ export class OrderController {
     @Request() req,
     @Body() dto: CreateOrderDto,
   ): Promise<Order> {
-    return await this.orderService.create(req.user.user_id, dto);
+    return await this.orderService.create(dto, req.user.user_id);
   }
 
   @Get()

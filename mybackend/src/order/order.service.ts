@@ -51,7 +51,7 @@ export class OrderService {
       .getMany();
   }
 
-  async create(user_id, dto: CreateOrderDto): Promise<Order> {
+  async create(dto: CreateOrderDto, user_id: number): Promise<Order> {
     try {
       const user = await this.userService.findById(user_id);
 
@@ -65,6 +65,7 @@ export class OrderService {
         provinsi: dto.provinsi,
         kota: dto.kota,
         alamat: dto.alamat,
+        kurir: dto.kurir,
         shippingMethod: dto.shippingMethod,
         shippingCost: dto.shippingCost,
         total_product: dto.totalProduct,

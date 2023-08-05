@@ -17,6 +17,7 @@ import ProductPage from './pages/admin/Product';
 import EditProductPage from './pages/admin/Product/Edit';
 import CategoryPage from './pages/admin/Category';
 import EditCategoryPage from './pages/admin/Category/Edt';
+import OrderPage from './pages/admin/Order';
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
             <Route path="product/edit/:id" element={<EditProductPage />} />
             <Route path="category" element={<CategoryPage />} />
             <Route path="category/edit/:id" element={<EditCategoryPage />} />
+            <Route path="order" element={<OrderPage />} />
 
             <Route path="user" element={<UserPage />} />
             <Route path="user/edit/:id" element={<EditUserPage />} />

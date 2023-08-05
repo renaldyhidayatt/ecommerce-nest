@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import snap from 'src/utils/midtrans';
 import { MidtransDto } from './midtrans.dto';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class MidtransService {
@@ -8,7 +9,7 @@ export class MidtransService {
     try {
       let parameter = {
         transaction_details: {
-          order_id: 'order-csb-' + Math.round(new Date().getTime() / 1000),
+          order_id: 'order-csb-' + uuidv4(),
           gross_amount: dto.gross_amount,
         },
         credit_card: {
@@ -16,19 +17,25 @@ export class MidtransService {
         },
         customer_details: {
           first_name: dto.firstname,
-          last_name: dto.lastName,
+          last_name: dto.lastname,
           email: dto.email,
           phone: dto.phone,
         },
         callbacks: {
-          finish: 'http://localhost:3000/orders',
+          finish: 'http://localhost:3000/order',
         },
       };
-      return snap.createTransaction(parameter).then((transaction) => {
-        console.log(transaction);
-        return transaction;
-      });
+      return snap
+        .createTransaction(parameter)
+        .then((transaction) => {
+          console.log(transaction);
+          return transaction;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     } catch (error) {
+      console.log(error);
       throw new NotFoundException(error);
     }
   }

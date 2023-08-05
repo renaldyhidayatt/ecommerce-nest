@@ -11,7 +11,7 @@ import {
   fetchCities,
   fetchProvinces,
 } from '../redux/rajaongkir';
-import MidtransPaymentButton from './test_midtrans';
+import MidtransPaymentButton from '../components/MidtransButton';
 import { myApi } from '../helpers/api';
 import { createOrderAsync } from '../redux/order';
 
@@ -26,6 +26,7 @@ const CheckoutForm = () => {
   const [shippingCost, setShippingCost] = useState(0);
   const [shippingMethod, setShippingMethod] = useState('');
   const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(false); // Added loading state
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
 
@@ -40,19 +41,14 @@ const CheckoutForm = () => {
 
   useEffect(() => {
     dispatch(fetchProvinces());
+    dispatch(fetchCartItems());
   }, [dispatch]);
 
   useEffect(() => {
     if (province) {
       dispatch(fetchCities(province));
     }
-    console.log('city_state:', city);
   }, [province]);
-
-  useEffect(() => {
-    dispatch(fetchCartItems());
-    console.log('courier', courier);
-  }, []);
 
   const checkCost = () => {
     try {
@@ -81,66 +77,6 @@ const CheckoutForm = () => {
       setShippingCost(shippingCosts[0].costs[0].cost[0].value);
     }
   }, [shippingCosts]);
-
-  const handleOrder = async () => {
-    try {
-      const formData = {
-        nama: recipientName,
-        phone: phoneNumber,
-        provinci: province,
-        kota: city,
-        alamat: addressDetail,
-        kurir: courier,
-        shippingMethod: shippingMethod,
-        shippingCost,
-        totalPrice: total,
-        totalProduct: totalProducts,
-      };
-      dispatch(createOrderAsync(formData));
-    } catch (error) {
-      console.error('Error submitting form:', error);
-    }
-  };
-
-  const handlePayment = async () => {
-    try {
-      const formData = {
-        gross_amount: total,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        phone: phoneNumber,
-      };
-
-      const response = await myApi.post('midtrans/transaction', formData);
-      const data = await response.data;
-
-      if (data && data.token) {
-        window.snap.pay(data.token, {
-          onSuccess: (result) => {
-            handleOrder();
-
-            console.log('Payment success');
-          },
-          onPending: (result) => {
-            console.log('Pending transaction', result);
-          },
-          onError: (result) => {
-            console.log('Error transaction', result);
-          },
-          onClose: () => {
-            console.log(
-              'Customer close the popup window without finishing the payment'
-            );
-          },
-        });
-      } else {
-        console.error('Snap Token is missing or invalid.');
-      }
-    } catch (error) {
-      console.error('Error fetching Snap Token:', error);
-    }
-  };
 
   const handleProvinceChange = (event) => {
     setProvince(event.target.value);
@@ -178,12 +114,92 @@ const CheckoutForm = () => {
       setShippingMethod(
         `${selectedCost.service} Rp. ${selectedCost.cost[0].value} Estimasi ${selectedCost.cost[0].etd}`
       );
+
+      console.log(shippingMethod);
     }
   };
 
   useEffect(() => {
     setTotal(subtotal + shippingCost);
   }, [shippingCost]);
+
+  const handlePayment = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      if (
+        !recipientName ||
+        !phoneNumber ||
+        !province ||
+        !city ||
+        !addressDetail ||
+        !courier ||
+        !shippingMethod ||
+        !shippingCost ||
+        total <= 0
+      ) {
+        console.error('Please fill out all required fields correctly.');
+        setLoading(false);
+        return;
+      }
+
+      const formDataOrder = {
+        nama: recipientName,
+        phone: phoneNumber,
+        provinsi: province,
+        kota: city,
+        alamat: addressDetail,
+        kurir: courier,
+        shippingMethod: shippingMethod,
+        shippingCost: shippingCost,
+        totalProduct: totalProducts.toString(),
+        totalPrice: total.toString(),
+      };
+
+      const formData = {
+        gross_amount: total,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        email: user.email,
+        phone: phoneNumber,
+      };
+
+      const response = await myApi.post('midtrans/transaction', formData);
+      const data = response.data;
+      console.log('data: ', data);
+
+      if (data && data.token) {
+        window.snap.pay(data.token, {
+          onSuccess: (result) => {
+            console.log('Success transaction');
+            dispatch(createOrderAsync(formDataOrder));
+            setLoading(false);
+          },
+          onPending: (result) => {
+            console.log('Pending transaction', result);
+            setLoading(false);
+          },
+          onError: (result) => {
+            console.log('Error transaction', result);
+            setLoading(false);
+          },
+          onClose: () => {
+            console.log(
+              'Customer close the popup window without finishing the payment'
+            );
+            setLoading(false);
+          },
+        });
+      } else {
+        console.error('Snap Token is missing or invalid.');
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error('Error fetching Snap Token:', error);
+      setLoading(false);
+    }
+  };
 
   return (
     <section className="max-w-screen-xl mx-auto mt-10">
@@ -198,7 +214,7 @@ const CheckoutForm = () => {
               <input
                 type="text"
                 id="name"
-                name="name"
+                name="recipientName"
                 value={recipientName}
                 onChange={handleRecipentName}
                 className="form-input w-full mt-1"
@@ -211,7 +227,7 @@ const CheckoutForm = () => {
               <input
                 type="text"
                 id="phone"
-                name="phone"
+                name="phoneNumber"
                 value={phoneNumber}
                 onChange={handlePhoneNumber}
                 className="form-input w-full mt-1"
@@ -222,14 +238,14 @@ const CheckoutForm = () => {
                 Provinsi
               </label>
               <select
-                name="province_id"
+                name="province"
                 id="province_id"
                 className="select-2"
                 value={province}
                 onChange={handleProvinceChange}
                 required
               >
-                <option value="" selected disabled>
+                <option value="" disabled>
                   -- Select Province --
                 </option>
                 {provinces.map((province) => (
@@ -247,7 +263,7 @@ const CheckoutForm = () => {
                 City
               </label>
               <select
-                name="city_id"
+                name="city"
                 id="city_id"
                 className="select-2"
                 value={city}
@@ -255,7 +271,7 @@ const CheckoutForm = () => {
                 disabled={!cities.length}
                 required
               >
-                <option value="" selected disabled>
+                <option value="" disabled>
                   -- Select City --
                 </option>
                 {cities.map((c) => (
@@ -273,7 +289,7 @@ const CheckoutForm = () => {
                 value={addressDetail}
                 onChange={handleAddressName}
                 id="address"
-                name="address"
+                name="addressDetail"
                 className="form-textarea w-full mt-1"
                 defaultValue={''}
               />
@@ -282,10 +298,12 @@ const CheckoutForm = () => {
               <label htmlFor="courier" className="block font-medium">
                 Courier
               </label>
-              <select onChange={handleCourierChange} value={courier}>
-                <option value="jne" selected>
-                  JNE
-                </option>
+              <select
+                onChange={handleCourierChange}
+                value={courier}
+                name="courier"
+              >
+                <option value="jne">JNE</option>
                 <option value="tiki">TIKI</option>
                 <option value="pos">POS INDONESIA</option>
               </select>
@@ -296,8 +314,11 @@ const CheckoutForm = () => {
               </label>
               <select
                 onChange={handleShippingMethodChange}
-                value={shippingMethods[0]?.service}
+                name="shippingMethods"
               >
+                <option value="" disabled>
+                  -- Select Shipment Method --
+                </option>
                 {shippingMethods.map((method) => (
                   <option key={method.service} value={method.service}>
                     {method.service} Rp. {method.cost[0].value} Estimasi{' '}
@@ -333,7 +354,11 @@ const CheckoutForm = () => {
               <label className="block font-medium">Total</label>
               <p>{total}</p>
             </div>
-            <MidtransPaymentButton handlePayment={handlePayment} />
+            <MidtransPaymentButton
+              handlePayment={handlePayment}
+              disabled={loading}
+            />
+            {loading && <p>Loading...</p>}{' '}
           </div>
         </div>
       </div>

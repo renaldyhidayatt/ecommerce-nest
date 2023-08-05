@@ -43,9 +43,9 @@ export default function OrderPage() {
               <thead>
                 <tr>
                   <th className="border p-2">Order ID</th>
-                  <th className="border p-2">Email</th>
-                  <th className="border p-2">Postal Code</th>
-                  <th className="border p-2">Country Code</th>
+                  <th className="border p-2">Nama</th>
+                  <th className="border p-2">Kota</th>
+                  <th className="border p-2">Provinsi</th>
                   <th className="border p-2">Total Product</th>
                   <th className="border p-2">Total Price</th>
                   <th className="border p-2">Delete</th>
@@ -60,9 +60,9 @@ export default function OrderPage() {
                   orders.map((row) => (
                     <tr key={row.order_id}>
                       <td className="border px-4 py-2">{row.order_id}</td>
-                      <td className="border px-4 py-2">{row.email}</td>
-                      <td className="border px-4 py-2">{row.postal_code}</td>
-                      <td className="border px-4 py-2">{row.country_code}</td>
+                      <td className="border px-4 py-2">{row.nama}</td>
+                      <td className="border px-4 py-2">{row.kota}</td>
+                      <td className="border px-4 py-2">{row.provinsi}</td>
                       <td className="border px-4 py-2">{row.total_product}</td>
                       <td className="border px-4 py-2">{row.total_price}</td>
                       <td className="border px-4 py-2">

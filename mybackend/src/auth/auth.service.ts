@@ -5,12 +5,14 @@ import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import PasswordHash from '../utils/hash';
 import { CreateUser } from 'src/user/dto/create.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UserService,
     private jwtService: JwtService,
+    private configService: ConfigService,
   ) {}
 
   async login(dto: LoginDto): Promise<string> {
@@ -49,7 +51,7 @@ export class AuthService {
       role: user.role,
     };
 
-    let secret = 'SECRET_KEY'; // Fallback secret
+    let secret = this.configService.get<string>('JWT_SECRET');
     let token = this.jwtService.sign(dataToken, { secret });
 
     return token;
