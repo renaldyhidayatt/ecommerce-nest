@@ -5,6 +5,7 @@ import { fetchAllSliders } from '../redux/slider';
 import Category from '../components/Category';
 import { fetchAllCategories } from '../redux/category';
 import Product from '../components/Product';
+import { IsError } from '../components/IsError';
 import { fetchProducts } from '../redux/product';
 import { LoadingIndicator } from '../components/Loading';
 
@@ -36,7 +37,7 @@ export default function Home() {
       {isLoading ? (
         <LoadingIndicator />
       ) : isError ? (
-        <isError error={isError} />
+        <IsError error={isError} />
       ) : (
         <>
           <Slider sliders={sliders} />

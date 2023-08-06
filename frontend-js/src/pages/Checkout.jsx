@@ -5,7 +5,7 @@ import {
   calculateTotalProducts,
   calculateWeight,
 } from '../helpers/utils';
-import { fetchCartItems } from '../redux/cart';
+import { deleteManyFromCart, fetchCartItems } from '../redux/cart';
 import {
   calculateShippingCost,
   fetchCities,
@@ -14,6 +14,8 @@ import {
 import MidtransPaymentButton from '../components/MidtransButton';
 import { myApi } from '../helpers/api';
 import { createOrderAsync } from '../redux/order';
+import { updateQuantity } from '../redux/product';
+import { getCartItemById } from '../helpers/cart';
 
 const CheckoutForm = () => {
   const [recipientName, setRecipientName] = useState('');
@@ -28,7 +30,7 @@ const CheckoutForm = () => {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false); // Added loading state
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.auth);
+  const { user, token } = useSelector((state) => state.auth);
 
   const cartItems = useSelector((state) => state.cart.cartItems);
   const subtotal = calculateSubtotal(cartItems);
@@ -165,15 +167,23 @@ const CheckoutForm = () => {
         phone: phoneNumber,
       };
 
-      const response = await myApi.post('midtrans/transaction', formData);
+      const response = await myApi.post('midtrans/transaction', formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = response.data;
-      console.log('data: ', data);
+      const cartIds = cartItems.map((item) => item.cart_id);
+      console.log(cartIds);
 
       if (data && data.token) {
         window.snap.pay(data.token, {
-          onSuccess: (result) => {
-            console.log('Success transaction');
+          onSuccess: async (result) => {
             dispatch(createOrderAsync(formDataOrder));
+
+            dispatch(updateQuantity(cartItems));
+            dispatch(deleteManyFromCart(cartIds));
+
             setLoading(false);
           },
           onPending: (result) => {

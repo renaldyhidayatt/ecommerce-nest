@@ -4,9 +4,14 @@ import { myApi } from '../helpers/api';
 // Async thunk action to fetch orders
 export const fetchOrdersAsync = createAsyncThunk(
   'order/fetchOrders',
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, getState }) => {
     try {
-      const response = await myApi.get('/order');
+      const token = getState().auth.token;
+      const response = await myApi.get('/order', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -42,9 +47,14 @@ export const exportExcel = createAsyncThunk(
 // Async thunk action to delete an order
 export const deleteOrderAsync = createAsyncThunk(
   'order/deleteOrder',
-  async (orderId, { rejectWithValue }) => {
+  async (orderId, { rejectWithValue, getState }) => {
     try {
-      const response = await myApi.delete(`/order/delete/${orderId}`);
+      const token = getState().auth.token;
+      const response = await myApi.delete(`/order/delete/${orderId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       return response.data;
     } catch (error) {
@@ -77,7 +87,6 @@ export const createOrderAsync = createAsyncThunk(
   }
 );
 
-// Order slice
 const orderSlice = createSlice({
   name: 'order',
   initialState: {

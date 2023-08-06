@@ -43,9 +43,14 @@ export const fetchProductBySlug = createAsyncThunk(
 // Thunk action to create a new product
 export const createProduct = createAsyncThunk(
   'products/createProduct',
-  async (productData, { rejectWithValue }) => {
+  async (productData, { rejectWithValue, getState }) => {
     try {
-      const response = await myApi.post(`/product/create`, productData);
+      const token = getState().auth.token;
+      const response = await myApi.post(`/product/create`, productData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -55,9 +60,14 @@ export const createProduct = createAsyncThunk(
 
 export const updateProductById = createAsyncThunk(
   'products/updateProductById',
-  async ({ id, updateData }, { rejectWithValue }) => {
+  async ({ id, updateData }, { rejectWithValue, getState }) => {
     try {
-      const response = await myApi.put(`/product/${id}`, updateData);
+      const token = getState().auth.token;
+      const response = await myApi.put(`/product/${id}`, updateData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -68,9 +78,13 @@ export const updateProductById = createAsyncThunk(
 // Thunk action to delete a product by ID
 export const deleteProductById = createAsyncThunk(
   'products/deleteProductById',
-  async (id, { rejectWithValue }) => {
+  async (id, { rejectWithValue, getState }) => {
     try {
-      const response = await myApi.delete(`/product/${id}`);
+      const response = await myApi.delete(`/product/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -80,11 +94,20 @@ export const deleteProductById = createAsyncThunk(
 
 export const updateQuantity = createAsyncThunk(
   'products/updateQuantity',
-  async (cart, { rejectWithValue }) => {
+  async (cart, { rejectWithValue, getState }) => {
     try {
-      const response = await myApi.post('/product/updatequantity', {
-        cart: cart,
-      });
+      const token = getState().auth.token;
+      const response = await myApi.post(
+        '/product/updatequantity',
+        {
+          cart: cart,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       return response.data;
     } catch (error) {

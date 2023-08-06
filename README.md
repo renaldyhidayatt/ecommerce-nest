@@ -12,7 +12,7 @@ Backend
 
 Frontend:
 
-- Javascript![Alt text](image.png)
+- Javascript
 - Framework Reactjs
 - Redux toolkit
 - Framework Css: Tailwind dan Flowbite
@@ -45,3 +45,7 @@ Frontend Admin:
 ### Demo Frontend
 
 <img src="./images/demo_frontend.png" alt="use_case_diagram">
+
+### Demo Swagger
+
+<img src="./images/dokumentasi_swagger.png" alt="use_case_diagram">

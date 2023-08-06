@@ -49,4 +49,23 @@ export class CartService {
     }
     await this.cartRepository.remove(cart);
   }
+
+  async deleteDeleteMany(cartIds: number[]): Promise<void> {
+    if (!cartIds || cartIds.length === 0) {
+      throw new Error('No cart ids');
+    }
+    for (const cartId of cartIds) {
+      const cart = await this.cartRepository.findOne({
+        where: {
+          cart_id: cartId,
+        },
+      });
+
+      if (!cart) {
+        throw new NotFoundException(`Cart with ID ${cartId} not found`);
+      }
+
+      await this.cartRepository.remove(cart);
+    }
+  }
 }

@@ -10,36 +10,52 @@ import {
   Post,
   Put,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { Product } from 'src/entities/Product';
-import { ApiConsumes, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiConsumes,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateProductDto } from './dto/create.dto';
 import { CartDto } from './dto/cart.dto';
+import { JwtGuard } from 'src/auth/guard/jwt.guard';
+import { RoleGuard } from 'src/auth/guard/role.guard';
+import { Role } from 'src/auth/decorator/role.decorator';
 
 @ApiTags('Product')
+@ApiBearerAuth()
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Get()
+  @ApiOperation({ summary: 'find all product' })
   findAll(): Promise<Product[]> {
     return this.productService.findAll();
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'find by id product' })
   findById(@Param('id') id: number): Promise<Product> {
     return this.productService.findById(id);
   }
 
   @Get('/slug/:slug')
+  @ApiOperation({ summary: 'find by slug product' })
   findBySlug(@Param('slug') slug: string): Promise<Product> {
     return this.productService.findBySlug(slug);
   }
 
+  @UseGuards(JwtGuard, RoleGuard)
+  @Role('administrator')
   @Post('/create')
+  @ApiOperation({ summary: 'create product' })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
   create(
@@ -57,9 +73,12 @@ export class ProductController {
     return this.productService.createProduct(createProduct, file);
   }
 
+  @UseGuards(JwtGuard, RoleGuard)
+  @Role('administrator')
   @Put('/:id')
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
+  @ApiOperation({ summary: 'update product' })
   updateById(
     @Param('id') id: number,
     @Body() updateProduct: CreateProductDto,
@@ -76,12 +95,17 @@ export class ProductController {
     return this.productService.updateProduct(id, updateProduct, file);
   }
 
+  @UseGuards(JwtGuard)
   @Post('/updatequantity')
+  @ApiOperation({ summary: 'update quantity berdasarkan cart' })
   updateQuantity(@Body('cart') cart: CartDto[]) {
     return this.productService.updateQuantity(cart);
   }
 
+  @UseGuards(JwtGuard, RoleGuard)
+  @Role('administrator')
   @Delete(':id')
+  @ApiOperation({ summary: 'delete product by id' })
   deleteById(@Param('id') id: number) {
     return this.productService.deleteProduct(id);
   }

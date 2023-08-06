@@ -1,6 +1,10 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { RajaOngkirService } from './raja_ongkir.service';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Raja-ongkir')
+@ApiBearerAuth()
+@UseGuards()
 @Controller('raja-ongkir')
 export class RajaOngkirController {
   constructor(private rajaOngkirService: RajaOngkirService) {}

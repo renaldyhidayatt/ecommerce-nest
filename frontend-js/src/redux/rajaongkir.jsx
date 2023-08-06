@@ -4,42 +4,55 @@ import { myApi } from '../helpers/api';
 
 export const fetchProvinces = createAsyncThunk(
   'rajaOngkir/fetchProvinces',
-  async () => {
+  async (_, { getState, rejectWithValue }) => {
     try {
-      const response = await myApi.get('/raja-ongkir');
-      console.log('raja-ongkir', response.data.results);
+      const token = getState().auth.token;
+      const response = await myApi.get('/raja-ongkir', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       return response.data.rajaongkir.results;
     } catch (error) {
-      throw new Error('Error fetching provinces:', error);
+      rejectWithValue(error.response.data);
     }
   }
 );
 
 export const fetchCities = createAsyncThunk(
   'rajaOngkir/fetchCities',
-  async (provId) => {
+  async (provId, { getState, rejectWithValue }) => {
     try {
-      const response = await myApi.get(`/raja-ongkir/kota/${provId}`);
+      const token = getState().auth.token;
+      const response = await myApi.get(`/raja-ongkir/kota/${provId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-      console.log('raja-ongkir-city', response.data.rajaongkir.results);
       return response.data.rajaongkir.results;
     } catch (error) {
-      throw new Error('Error fetching cities:', error);
+      rejectWithValue(error.response.data);
     }
   }
 );
 
 export const calculateShippingCost = createAsyncThunk(
   'rajaOngkir/calculateShippingCost',
-  async ({ asal, tujuan, berat, kurir }) => {
+  async ({ asal, tujuan, berat, kurir }, { rejectWithValue, getState }) => {
     try {
+      const token = getState().auth.token;
       const response = await myApi.get(
-        `/raja-ongkir/ongkos/${asal}/${tujuan}/${berat}/${kurir}`
+        `/raja-ongkir/ongkos/${asal}/${tujuan}/${berat}/${kurir}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
-      console.log('raja-ongkir-cost', response.data.rajaongkir.results);
       return response.data.rajaongkir.results;
     } catch (error) {
-      throw new Error('Error calculating shipping cost:', error);
+      rejectWithValue(error.response.data);
     }
   }
 );

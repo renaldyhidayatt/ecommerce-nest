@@ -3,7 +3,7 @@ import { myApi } from '../helpers/api';
 
 export const fetchAllCategories = createAsyncThunk(
   'category/fetchAll',
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, getState }) => {
     try {
       const response = await myApi.get('/category');
       return response.data;

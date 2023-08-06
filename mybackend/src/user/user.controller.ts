@@ -13,37 +13,42 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { User } from 'src/entities/User';
 import { CreateUser } from './dto/create.dto';
 import { UpdateUserDto } from './dto/update.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
+import { RoleGuard } from 'src/auth/guard/role.guard';
+import { Role } from 'src/auth/decorator/role.decorator';
 
 @ApiTags('User')
+@ApiBearerAuth()
 @Controller('user')
-// @UseGuards(JwtGuard)
+@UseGuards(JwtGuard, RoleGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Role('administrator')
   @Post('/create')
   create(@Body() createUser: CreateUser): Promise<User> {
     return this.userService.create(createUser);
   }
 
+  @Role('administrator')
   @Get()
   findAll(): Promise<User[]> {
     return this.userService.findAll();
   }
 
+  @Role('administrator')
   @Get(':id')
   findById(@Param('id') id: number): Promise<User> {
     return this.userService.findById(id);
   }
 
+  @Role('administrator')
   @Put(':id')
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
@@ -63,6 +68,7 @@ export class UserController {
     return this.userService.updateById(id, updateUser, file);
   }
 
+  @Role('administrator')
   @Delete(':id')
   deleteById(@Param('id') id: number) {
     return this.userService.deleteById(id);

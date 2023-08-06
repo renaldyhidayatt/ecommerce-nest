@@ -15,7 +15,12 @@ import {
 } from '@nestjs/common';
 import { SliderService } from './slider.service';
 import { Slider } from 'src/entities/Slider';
-import { ApiConsumes, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiConsumes,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateSliderDto } from './dto/create.dto';
 import { UpdateSliderDto } from './dto/update.dto';
@@ -24,6 +29,7 @@ import { RoleGuard } from 'src/auth/guard/role.guard';
 import { Role } from 'src/auth/decorator/role.decorator';
 
 @ApiTags('Slider')
+@ApiBearerAuth()
 @Controller('slider')
 export class SliderController {
   constructor(private sliderService: SliderService) {}
@@ -33,13 +39,18 @@ export class SliderController {
     return this.sliderService.findAll();
   }
 
+  @UseGuards(JwtGuard)
+  @Role('administrator')
   @Get('/:id')
   findById(@Param('id') id: number): Promise<Slider> {
     return this.sliderService.findById(id);
   }
 
+  @UseGuards(JwtGuard)
+  @Role('administrator')
   @Post('/create')
   @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'create category' })
   @UseInterceptors(FileInterceptor('file'))
   create(
     @Body() createSlider: CreateSliderDto,
@@ -56,8 +67,11 @@ export class SliderController {
     return this.sliderService.createSlider(createSlider, file);
   }
 
+  @UseGuards(JwtGuard)
+  @Role('administrator')
   @Put('/:id')
   @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'update category' })
   @UseInterceptors(FileInterceptor('file'))
   updateById(
     @Param('id') id: number,
@@ -75,9 +89,10 @@ export class SliderController {
     return this.sliderService.updateSlider(id, updateSlider, file);
   }
 
-  @Delete(':id')
-  @UseGuards(JwtGuard, RoleGuard)
+  @UseGuards(JwtGuard)
   @Role('administrator')
+  @ApiOperation({ summary: 'delete slider' })
+  @Delete(':id')
   deleteById(@Param('id') id: number) {
     return this.sliderService.deleteSlider(id);
   }
